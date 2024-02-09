@@ -391,17 +391,18 @@ namespace HybridWebSocket
             {
                 { "X-Ab-LobbySessionID", sessionId }
             };
-            
+
             if (entitlementToken != null)
             {
                 customHeader.Add("Entitlement", entitlementToken);
             }
-            
+
             Connect(url, protocols, customHeader);
         }
 
         public void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null)
         {
+            AccelByteDebug.Log($"websocket connect to: {url}");
             try
             {
                 webSocket = string.IsNullOrEmpty(protocols) ? new NativeWebSocket.WebSocket(url, customHeaders) : new NativeWebSocket.WebSocket(url, protocols, customHeaders);
@@ -439,25 +440,25 @@ namespace HybridWebSocket
 
             switch (webSocket.State)
             {
-            case NativeWebSocket.WebSocketState.Open:
-                AccelByteDebug.Log($"Websocket connection to {url} already opened");
-                return;
-            case NativeWebSocket.WebSocketState.Connecting:
-                AccelByteDebug.LogWarning($"Websocket connection to {url} is connecting");
-                break;
-            case NativeWebSocket.WebSocketState.Closing: throw new WebSocketInvalidStateException("WebSocket is closing.");
-            case NativeWebSocket.WebSocketState.Closed:
-            default:
-                try
-                {
-                    webSocket.Connect();
-                }
-                catch (Exception e)
-                {
-                    throw new WebSocketUnexpectedException("Websocket failed to connect.", e);
-                }
+                case NativeWebSocket.WebSocketState.Open:
+                    AccelByteDebug.Log($"Websocket connection to {url} already opened");
+                    return;
+                case NativeWebSocket.WebSocketState.Connecting:
+                    AccelByteDebug.LogWarning($"Websocket connection to {url} is connecting");
+                    break;
+                case NativeWebSocket.WebSocketState.Closing: throw new WebSocketInvalidStateException("WebSocket is closing.");
+                case NativeWebSocket.WebSocketState.Closed:
+                default:
+                    try
+                    {
+                        webSocket.Connect();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new WebSocketUnexpectedException("Websocket failed to connect.", e);
+                    }
 
-                break;
+                    break;
             }
         }
 
